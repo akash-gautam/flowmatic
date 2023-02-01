@@ -20,11 +20,13 @@ metadata:
     control-plane: kubeflow
     istio-injection: enabled
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: kfdefs.kfdef.apps.kubeflow.org
 spec:
+  conversion:
+    strategy: None
   group: kfdef.apps.kubeflow.org
   names:
     kind: KfDef
@@ -32,30 +34,12 @@ spec:
     plural: kfdefs
     singular: kfdef
   scope: Namespaced
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      description: KfDef is the Schema for the kfdefs API
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          description: KfDefSpec defines the desired state of KfDef
-          type: object
-        status:
-          description: KfDefStatus defines the observed state of KfDef
-          type: object
-      type: object
-  version: v1
   versions:
   - name: v1
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
     served: true
     storage: true
 ---
@@ -147,11 +131,6 @@ spec:
         name: manifests
         path: manifests/kubeflow-manifests/namespaces/base
     name: namespaces
-  - kustomizeConfig:
-      repoRef:
-        name: manifests
-        path: manifests/kubeflow-manifests/application/v3
-    name: application
   - kustomizeConfig:
       parameters:
 {{ if .Variables.ExposeLoadBalancer }}
@@ -305,5 +284,5 @@ spec:
     name: kfserving
   repos:
     - name: manifests
-      uri: github.com/kubermatic/flowmatic?ref=master
-  version: v1.2-branch
+      uri: github.com/akash-gautam/flowmatic?ref=update-kubeflow-manifests
+  version: update-kubeflow-manifests
